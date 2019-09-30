@@ -31,16 +31,15 @@ numLED = 16
 ORDER = neopixel.GRB
 tempLED = neopixel.NeoPixel(tempLEDPin, numLED, brightness=0.2, auto_write=False, pixel_order=ORDER)
 
-
 # SetUp temp range and color range.  range for computer: 25 - 65 or 70?
-minBTemp = 23
+minBTemp = 21
 maxBTemp = 27
 
 midGTemp = 27
 rngGTemp = 3
 
-minRTemp = 26
-maxRTemp = 30
+minRTemp = 27
+maxRTemp = 32
 
 minRed = 0
 maxRed = 150
@@ -89,22 +88,22 @@ while True:
     if b_1 > minBlu:
         b_1 = minBlu
 
-    print('Temp: {0:0.3f}C'.format(ds18_0.temperature))
-    print(r_0)
-    print(g_0)
-    print(b_0)
-    print('Temp: {0:0.3f}C'.format(ds18_1.temperature))
-    print(r_1)
-    print(g_1)
-    print(b_1)
+    print('Temp_1: {0:0.3f}C'.format(ds18_1.temperature))
+ #   print(r_1)
+ #   print(g_1)
+ #   print(b_1)
+    print('Temp_0: {0:0.3f}C'.format(ds18_0.temperature))
+ #   print(r_0)
+ #   print(g_0)
+ #   print(b_0)
     print()
 
-# not heartbeat to pulse LED(13) for heartbeat
+# using 'not' for heartbeat to pulse LED(13) for heartbeat
     heartbeat.value = not heartbeat.value
     for i in range(0, (numLED/2), 1):
         tempLED[i] = (r_0, g_0, b_0)
-        tempLED[i+8] = (r_1, g_1, b_1)
-
+        tempLED[i+int(numLED/2)] = (r_1, g_1, b_1)
 
     tempLED.show()
-    time.sleep(1.0)
+    time.sleep(0.5)
+
