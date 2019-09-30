@@ -22,26 +22,61 @@ ow_bus = OneWireBus(board.D5)
 ds18 = DS18X20(ow_bus, ow_bus.scan()[0])
 
 # SetUp NeoPixels
-temp_LED_pin = board.A1
-num_LED = 16
+tempLEDPin = board.A1
+numLED = 16
 ORDER = neopixel.GRB
-temp_LED = neopixel.NeoPixel(temp_LED_pin, num_LED, pixel_order=ORDER)
+tempLED = neopixel.NeoPixel(tempLEDPin, numLED, brightness=0.2, auto_write=False, pixel_order=ORDER)
 
-n = 0
+
+# SetUp temp range and color range.  range for computer: 25 - 65 or 70?
+minBTemp = 23
+maxBTemp = 27
+
+midGTemp = 27
+rngGTemp = 3
+
+minRTemp = 26
+maxRTemp = 30
+
+minRed = 0
+maxRed = 150
+minGrn = 0
+maxGrn = 100
+minBlu = 100
+maxBlu = 0
 
 # Main loop to print the temperature every second.
 while True:
-    print('Temperature: {0:0.3f}C'.format(ds18.temperature))
-    r = int(ds18.temperature *0.8)
-    temp_LED[n] = (r, 0, 15)
 
-    time.sleep(1.0)
+    celc = (ds18.temperature)
+
+    r = int(((celc-minRTemp)/(maxRTemp - minRTemp))*(maxRed-minRed))
+    g = int((rngGTemp-(abs(midGTemp - celc)))/(rngGTemp) * (maxGrn-minGrn))
+    b = int(minBlu-((celc-minBTemp)/(maxBTemp - minBTemp))*(minBlu-maxBlu))
+
+    if r < minRed:
+        r = minRed
+    if g < minGrn:
+        g = minGrn
+    if b < maxBlu:
+        b = maxBlu
+    if r > maxRed:
+        r = maxRed
+    if g > maxGrn:
+        g = maxGrn
+    if b > minBlu:
+        b = minBlu
+
+    print('Temp: {0:0.3f}C'.format(ds18.temperature))
+    print(r)
+    print(g, (rngGTemp-(abs(midGTemp - celc))/(rngGTemp)), sep=", ")
+    print(b)
+    print()
+
 # not heartbeat to pulse LED(13) for heartbeat
     heartbeat.value = not heartbeat.value
-    if n > 14:
-        n = 0
-        temp_LED.fill((0, 0, 0))
-        temp_LED.show()
-    else:
-        n = n+1
+    for i in range(0, numLED, 1):
+        tempLED[i] = (r, g, b)
 
+    tempLED.show()
+    time.sleep(1.0)
